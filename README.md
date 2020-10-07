@@ -1,5 +1,6 @@
 # My-sixth-attempt-at-making-a-simple-neural-network-library-in-python-from-scratch
 This is my attempt at making a neural network from scratch. I have been working on this since 2016. The goal of this project is to create a library capable of making and training a neural network of any arbitrary size while only using the library "random".
+
 __________________________________________________how to use_________________________________________
 
 The class "network" makes a feed forward neural network object of any size(determined by a list of the number of nodes in each layer.)
