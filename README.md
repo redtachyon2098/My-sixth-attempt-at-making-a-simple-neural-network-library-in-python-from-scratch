@@ -41,6 +41,6 @@ the function "backprop" calculates the derivative of the cost function in respec
 the function "train" trains the network using multiple training examples using gradient descent. The method used to calculate the gradient is determined by modifying the line after the first comment, changing the function name from "backprop" to "gradient", or vice versa.
 example:
 
-a.train([[0,0],[0,1],[1,0],[1,1]], [[0],[1],[1],[0]], 0.5, 1000 # this trains the network on the four training examples and their desired outputs.
+a.train([[0,0],[0,1],[1,0],[1,1]], [[0],[1],[1],[0]], 0.5, 1000) # this trains the network on the four training examples and their desired outputs.
 
 the function "train_" is there for experimental purposes and can be ignored completely.
