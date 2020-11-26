@@ -36,7 +36,7 @@ the functions "cost" and "cost_" each calculates the cost of the network, and th
 
 the function "gradient" calculates the derivative of the cost function in respect to each weight and bias by adding a small number( in this case, 10^(-8) ) and measuring the difference of the cost. This method, although it is valid, is incredibly inefficient, since it requires the time consuming "predict" function to run multiple times.
 
-the function "backprop" calculates the derivative of the cost function in respect to each weight and bias using the chain rule( see this youtube video by 3blue1brown explaining this method in detail: https://www.youtube.com/watch?v=tIeHLnjs5U8&t=546s ). Since I am not experienced enough, this function is still produces wrong answers, therefore not training the network properly. If you know a way to fix this, let me know through email.
+the function "backprop" calculates the derivative of the cost function in respect to each weight and bias using the chain rule( see this youtube video by 3blue1brown explaining this method in detail: https://www.youtube.com/watch?v=tIeHLnjs5U8&t=546s ). Since I am not experienced enough, this function is still producing wrong answers, therefore it is not training the network properly. If you know a way to fix this, let me know through email.
 
 the function "train" trains the network using multiple training examples using gradient descent. The method used to calculate the gradient is determined by modifying the line after the first comment, changing the function name from "backprop" to "gradient", or vice versa.
 example:
