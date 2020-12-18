@@ -48,15 +48,12 @@ class network:
         for x in range(nodes[0]):
             a.append(0)
         self.nodes.append(a)
-        self.raw.append(a)
         for x in range(len(nodes) - 1):
             self.nodes.append([])
-            self.raw.append([])
             self.biases.append([])
             self.weights.append([])
             for y in range(nodes[x + 1]):
                 self.nodes[x + 1].append(0)
-                self.raw[x + 1].append(0)
                 self.biases[x].append(r.random())
                 self.weights[x].append([])
                 for z in range(nodes[x]):
@@ -74,7 +71,6 @@ class network:
                 a.append(activation(b))
                 c.append(b)
             self.nodes[x + 1] = a
-            self.raw[x + 1] = c
 
     def output(self):
         return self.nodes[len(self.nodes) - 1]
