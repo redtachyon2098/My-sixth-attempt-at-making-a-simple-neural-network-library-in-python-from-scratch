@@ -123,102 +123,47 @@ class network:
                     b[0][x][y].append(1e+8 * (c - a))
         return b
 
-    def backprop(self,input_list,output_list):
-        a = []
-        b = []
-        deriv = []
-        for x in range(len(self.nodes)):
-            deriv.append([])
-            for y in range(len(self.nodes[x])):
-                deriv[x].append(0)
-        for t in range(len(self.nodes) - 1):
-            x = t + 1
-            for y in range(len(self.nodes[x])):
-                deriv[x][y] = (activation(self.raw[x][y] + 0.00001) - self.nodes[x][y]) * 100000
-        for x in range(len(self.weights)):
-            a.append([])
-            b.append([])
-            for y in range(len(self.weights[x])):
-                a[x].append([])
-                b[x].append(0)
-                for z in range(len(self.weights[x][y])):
-                    a[x][y].append(0)
-        costs = self.cost_(input_list,output_list)
-        for q in range(len(deriv[len(deriv) - 1])):
-            deriv[len(deriv) - 1][q] *= costs[q]
-        for q in range(len(self.weights)):
-            x = len(self.weights) - q - 1
-            for y in range(len(self.weights[x])):
-                b[x][y] = deriv[x + 1][y]
-                for z in range(len(self.weights[x][y])):
-                    a[x][y][z] = self.nodes[x][z] * deriv[x + 1][y]
-            for y in range(len(deriv[x])):
-                buffer = 0
-                for z in range(len(deriv[x + 1])):
-                    buffer += self.weights[x][z][y] * deriv[x + 1][z]
-                deriv[x][y] *= buffer
-        return [a,b]
-
     def train(self,inputs,outputs,LearnRate,iterations):
         for q in range(iterations):
+            avgw = []
+            avgb = []
+            total = 0
+            avgCost = 0
+            backW = self.weights
+            backB = self.biases
+            for x in range(len(self.weights)):
+                avgw.append([])
+                avgb.append([])
+                for y in range(len(self.weights[x])):
+                    avgw[x].append([])
+                    avgb[x].append(0)
+                    for z in range(len(self.weights[x][y])):
+                        avgw[x][y].append(0)
             for r in range(len(inputs)):
-                #Line used to determine calculation method
                 c = self.gradient(inputs[r],outputs[r])
+                avgCost += self.CostValue / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
-                        self.biases[x][y] -= c[1][x][y] * LearnRate / len(inputs)
+                        avgb[x][y] += c[1][x][y] / len(inputs)
+                        total += c[1][x][y]
                         for z in range(len(self.weights[x][y])):
-                            self.weights[x][y][z] -= c[0][x][y][z] * LearnRate / len(inputs)
-            #if(int(q / 10) == q / 10):
-            #    print(self.backprop(inputs[r],outputs[r]))
-            #    print(" ")
-            #    print(self.gradient(inputs[r],outputs[r]))
-            #    print(" ")
-            #    print(" ")
-            #    print(" ")
-            #    print(" ")
-            if(int(q / 10) == q / 10):
-                print("Iteration:", q, "loss:",self.CostValue)
-        print("final loss:",self.CostValue)
-
-    def train_(self,inputs,outputs,LearnRate,iterations):
-        for q in range(iterations):
-            a = self.weights
-            b = self.biases
-            totalgrad = 0
-            AverageCost = 0
-            for m in range(len(inputs)):
-                AverageCost += self.cost(inputs[m],outputs[m]) / len(inputs)
+                            avgw[x][y][z] += c[0][x][y][z] / len(inputs)
+                            total += c[0][x][y][z]
+            if(total < 0):
+                total = -total
+            if(total == 0):
+                total = 1e-256
             for x in range(len(self.weights)):
                 for y in range(len(self.weights[x])):
+                    self.biases[x][y] -= avgb[x][y] * LearnRate * (avgCost)**0.5 / total
                     for z in range(len(self.weights[x][y])):
-                        self.weights[x][y][z] += 0.0001
-                        Value = 0
-                        for m in range(len(inputs)):
-                            Value += self.cost(inputs[m],outputs[m])
-                        Value /= len(inputs)
-                        self.weights[x][y][z] -= 0.0001
-                        a[x][y][z] = (Value - AverageCost) * 10000
-                        totalgrad += a[x][y][z]
-                    self.biases[x][y] += 0.0001
-                    Value = 0
-                    for m in range(len(inputs)):
-                        Value += self.cost(inputs[m],outputs[m])
-                    Value /= len(inputs)
-                    self.biases[x][y] -= 0.0001
-                    b[x][y] = (Value - AverageCost) * 10000
-                    totalgrad += b[x][y]
-            for x in range(len(self.biases)):
-                for y in range(len(self.biases[x])):
-                    for z in range(len(self.weights[x][y])):
-                        self.weights[x][y][z] -= LearnRate * AverageCost * a[x][y][z] / totalgrad
-                    self.biases[x][y] -= LearnRate * AverageCost * b[x][y] / totalgrad
-            #if(int(q / 1) == q / 1):
-            #    print("loss:",AverageCost)
-        #print("final loss:",AverageCost)
-
-#_________________________________________________________________________
-
-r.seed(10)
-a = network([2,3,1])
-#a.train([[0,0],[0,1],[1,0],[1,1]],[[0],[1],[1],[0]],1,10000)
+                        self.weights[x][y][z] -= avgw[x][y][z] * LearnRate * (avgCost)**0.5 / total
+            if(q > 1 and avgCost > lastC):
+                self.weights = backW
+                self.biases = backB
+                print(q,lastC,avgCost)
+                break
+            lastC = avgCost
+            if(int(q / 50) == q / 50):
+                print("Iteration:", q, "loss:",avgCost)
+        print("final loss:",avgCost)
