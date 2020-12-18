@@ -44,7 +44,6 @@ class network:
         self.nodes = []
         self.weights = []
         self.biases = []
-        self.raw = []
         a = []
         for x in range(nodes[0]):
             a.append(0)
@@ -90,18 +89,6 @@ class network:
             except OverflowError:
                 b += 16e+256
         self.CostValue = b
-        return b
-
-    def cost_(self,input_list,output_list):
-        self.predict(input_list)
-        a = self.output()
-        b = []
-        for x in range(len(a)):
-            try:
-                b.append(2 * (a[x] - output_list[x]))
-            except OverflowError:
-                b.append(16e+256)
-        self.CostValue = average(b)
         return b
 
     def gradient(self,input_list,output_list):
