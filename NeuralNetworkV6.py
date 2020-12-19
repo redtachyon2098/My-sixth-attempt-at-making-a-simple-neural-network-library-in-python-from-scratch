@@ -40,12 +40,12 @@ def average(numbers):
 
 class network:
     def __init__(self,nodes):
-        self.CostValue = 0
+        self.costv = 0
         self.nodes = []
         self.weights = []
         self.biases = []
-        self.cos = 0
         a = []
+        self.CostValue = 0
         for x in range(nodes[0]):
             a.append(0)
         self.nodes.append(a)
@@ -85,7 +85,7 @@ class network:
                 b += ((a[x] - output_list[x]) ** 2)
             except OverflowError:
                 b += 16e+256
-                self.cos = b
+        self.costv = b
         return b
 
     def gradient(self,input_list,output_list):
@@ -125,7 +125,7 @@ class network:
                         avgw[x][y].append(0)
             for r in range(len(inputs)):
                 c = self.gradient(inputs[r],outputs[r])
-                avgCost += self.cos / len(inputs)
+                avgCost += self.costv / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
                         avgb[x][y] += c[1][x][y] / len(inputs)
@@ -148,7 +148,7 @@ class network:
                 print(q,lastC,avgCost)
                 break
             lastC = avgCost
-            self.CostValue = avgCost
+            self.CostValue = lastC
             if(int(q / 50) == q / 50):
                 print("Iteration:", q, "loss:",avgCost)
         print("final loss:",avgCost)
