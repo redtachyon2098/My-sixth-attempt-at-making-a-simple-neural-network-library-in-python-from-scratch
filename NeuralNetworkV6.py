@@ -84,7 +84,6 @@ class network:
                 b += ((a[x] - output_list[x]) ** 2)
             except OverflowError:
                 b += 16e+256
-        self.CostValue = b
         return b
 
     def gradient(self,input_list,output_list):
@@ -147,6 +146,7 @@ class network:
                 print(q,lastC,avgCost)
                 break
             lastC = avgCost
+            self.CostValue = avgCost
             if(int(q / 50) == q / 50):
                 print("Iteration:", q, "loss:",avgCost)
         print("final loss:",avgCost)
