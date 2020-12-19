@@ -44,6 +44,7 @@ class network:
         self.nodes = []
         self.weights = []
         self.biases = []
+        self.cos = 0
         a = []
         for x in range(nodes[0]):
             a.append(0)
@@ -84,6 +85,7 @@ class network:
                 b += ((a[x] - output_list[x]) ** 2)
             except OverflowError:
                 b += 16e+256
+                self.cos = b
         return b
 
     def gradient(self,input_list,output_list):
@@ -123,7 +125,7 @@ class network:
                         avgw[x][y].append(0)
             for r in range(len(inputs)):
                 c = self.gradient(inputs[r],outputs[r])
-                avgCost += self.CostValue / len(inputs)
+                avgCost += self.cos / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
                         avgb[x][y] += c[1][x][y] / len(inputs)
