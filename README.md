@@ -1,7 +1,7 @@
 # My-sixth-attempt-at-making-a-simple-neural-network-library-in-python-from-scratch
 This is my attempt at making a neural network from scratch. I have been working on this since 2016. The goal of this project is to create a library capable of making and training a neural network of any arbitrary size while only using the library "random".
 
-__________________________________________________how to use_________________________________________
+__________________________________________________functions__________________________________________________
 
 The class "network" makes a feed forward neural network object of any size(determined by a list of the number of nodes in each layer.)
 example:
@@ -34,8 +34,36 @@ a.predict([1,1]); a.output() #makes a prediction, and returns the result.
 
 the function "cost" calculates the cost of the network, and the derivatives of the cost respectively and can be ignored. It is used when calculating the gradients.
 
-the function "gradient" calculates the derivative of the cost function in respect to each weight and bias in the most childish way possible: by adding a small number( in this case, 10^(-8) ) and measuring the difference of the cost. This method, although it is valid, is incredibly inefficient, since it requires the time consuming "predict" function to run neumerous times( literally for every weight and bias ).
+the function "gradient" calculates the derivative of the cost function in respect to each weight and bias in the most primitive way possible: by adding a small number( in this case, 10^(-8) ) and measuring the difference of the cost. This method, although it is valid, is incredibly inefficient, since it requires the time consuming "predict" function to run neumerous times( literally for every weight and bias ).
 
-the function "train" trains the network on multiple training examples determined by the two lists "inputs", and "outputs". The first list is for the inputs, and the second list is for the corresponding desired outputs. It uses the aforementioned childish version of gradient descent. Example:
+the function "train" trains the network on multiple training examples determined by the two lists "inputs", and "outputs". The first list is for the inputs, and the second list is for the corresponding desired outputs. It uses the aforementioned primitive version of gradient descent. Example:
 
-a.train([[0,0],[0,1],[1,0],[1,1]], [[0],[1],[1],[0]], 0.5, 1000) # this trains the network on the four training examples and their desired outputs.
+a.train([[0,0],[0,1],[1,0],[1,1]], [[0],[1],[1],[0]], 0.5, 1000) # this trains the network on the training examples and their desired outputs. In this case, the classic XOR truth table.
+
+You can toggle whether the code prints various information to the console by changing the variable "alertatall" to be True or False.
+
+"toomuch" is the same as "train" but it only trains the network on a few randomly chosen training examples at a time to speed up the process. Because of this function, there isn't any real need to use "train" anymore, but it is still there for backwards compatibility.
+
+There are additional functions. "backup()" creates three text files in the same location as the code itself which together, carries the information necessary for perfectly reconstructing the neural network(The weights, and the biases. The values in the nodes are not stored however, because it is not needed for the network to function.) This is used in order to be able to train the network, stop it, and then keep training it without losing any progress, even if you reboot your computer. Note: The files "backup()" creates have the names "n", "w", "b" by default. Make sure you don't have another text file with those names, or it may become overwritten.
+
+a.backup() #Backs up the network into three text files.
+
+"load()" reads from the three text files created by backup() and creates a neural network which has the same weights and biases as the previously backed up network. The values of the nodes are not persistens, and they will be zero'ed out.
+
+a.load() #Restores the previously backed up network.
+
+"expandlayer()" adds another layer on top of the neural network without changing its inputs and outputs.
+
+a.expandlayer() #Expands the network by one layer.
+
+"expandnode()" adds a node to a random layer without changing its inputs and outputs.
+
+a.expandnode() #Expands the network by one layer.
+
+"deviate(count, randomness)" creates several randomly-altered versions of the network without changing the original. Exactly how many versions are created is determined by the first argument.("count" in this case.) The maximum value a weight or bias can be changed by is determined by the second argument.("randomness" in this case.)
+
+a.deviate(10, 1) #returns 10 slightly altered versions of the original network, each weight and bias being changed by values ranging from -1 to 1.
+
+"refine(input, outputs, unitcount, randomness, iterations)" refines the network by creating a number of slightly altered networks and choosing the best one, then altering that new one, over and over. For big networks, this is faster than "train".
+
+a.refine([[0,0],[0,1],[1,0],[1,1]], [[0],[1],[1],[0]], 100, 0.5, 1000) #This creates 100 different versions of the original network(each differing from the original by 0.5) and chooses the best one, 1000 times.
