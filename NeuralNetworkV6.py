@@ -46,10 +46,23 @@ def average(numbers):
         b += numbers[x]
     return b / len(numbers)
 
+def clone(thing):
+    if(type(thing) == list):
+        a = []
+        for x in range(len(thing)):
+            a.append(clone(thing[x]))
+        return a
+    else:
+        return thing
+
+def derivative(x):
+    return 1e+8 * (activation(x + 1e-8) - activation(x))
+
 class network:
     def __init__(self,nodes):
         self.costv = 0
         self.nodes = []
+        self.raw = []
         self.weights = []
         self.biases = []
         a = []
@@ -57,12 +70,15 @@ class network:
         for x in range(nodes[0]):
             a.append(0)
         self.nodes.append(a)
+        self.raw.append(a)
         for x in range(len(nodes) - 1):
             self.nodes.append([])
+            self.raw.append([])
             self.biases.append([])
             self.weights.append([])
             for y in range(nodes[x + 1]):
                 self.nodes[x + 1].append(0)
+                self.raw[x + 1].append(0)
                 self.biases[x].append(r.random())
                 self.weights[x].append([])
                 for z in range(nodes[x]):
@@ -149,11 +165,13 @@ class network:
                     weights[x][y].append(weightnumbers[q])
                     q += 1
         self.nodes = nodes
+        self.raw = nodes
         self.weights = weights
         self.biases = biases
 
     def predict(self,input_list):
         self.nodes[0] = input_list
+        self.raw[0] = input_list
         for x in range(len(self.biases)):
             a = []
             c = []
@@ -164,6 +182,7 @@ class network:
                 a.append(activation(b))
                 c.append(b)
             self.nodes[x + 1] = a
+            self.raw[x + 1] = c
 
     def output(self):
         return self.nodes[len(self.nodes) - 1]
@@ -180,24 +199,28 @@ class network:
         self.costv = b
         return b
 
-    def gradient(self,input_list,output_list):
-        a = self.cost(input_list,output_list)
-        b = [[],[]]
-        for x in range(len(self.biases)):
-            b[0].append([])
-            b[1].append([])
-            for y in range(len(self.biases[x])):
-                b[0][x].append([])
-                self.biases[x][y] += 1e-8
-                c = self.cost(input_list,output_list)
-                self.biases[x][y] -= 1e-8
-                b[1][x].append(1e+8 * (c - a))
-                for z in range(len(self.weights[x][y])):
-                    self.weights[x][y][z] += 1e-8
-                    c = self.cost(input_list,output_list)
-                    self.weights[x][y][z] -= 1e-8
-                    b[0][x][y].append(1e+8 * (c - a))
-        return b
+    def backprop(self, input_list, output_list):
+        costnumber = self.cost(input_list, output_list)
+        self.predict(input_list)
+        w = clone(self.weights)
+        b = clone(self.biases)
+        expectedoutput = output_list
+        for p in range(len(self.nodes) - 1):
+            x = len(self.nodes) - p - 1
+            differences = []
+            for y in range(len(self.nodes[x])):
+                differences.append(self.nodes[x][y] - expectedoutput[y])
+            for y in range(len(self.nodes[x])):
+                b[x - 1][y] = 2 * differences[y] * derivative(self.raw[x][y])
+                for z in range(len(self.nodes[x - 1])):
+                    w[x - 1][y][z] = self.nodes[x - 1][z] * 2 * differences[y] * derivative(self.raw[x][y])
+            expectedoutput = []
+            for y in range(len(self.nodes[x - 1])):
+                a = 0
+                for z in range(len(self.nodes[x])):
+                    a += self.weights[x - 1][z][y] * 2 * differences[z] * derivative(self.raw[x][z])
+                expectedoutput.append(((a / len(self.nodes[x])) / (-2)) + self.nodes[x - 1][y])
+        return [w,b]
 
     def train(self,inputs,outputs,LearnRate,iterations):
         for q in range(iterations):
@@ -216,7 +239,7 @@ class network:
                     for z in range(len(self.weights[x][y])):
                         avgw[x][y].append(0)
             for r in range(len(inputs)):
-                c = self.gradient(inputs[r],outputs[r])
+                c = self.backprop(inputs[r],outputs[r])
                 avgCost += self.costv / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
@@ -274,7 +297,7 @@ class network:
                     for z in range(len(self.weights[x][y])):
                         avgw[x][y].append(0)
             for j in range(len(inputs)):
-                c = self.gradient(inputs[j],outputs[j])
+                c = self.backprop(inputs[j],outputs[j])
                 avgCost += self.costv / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
