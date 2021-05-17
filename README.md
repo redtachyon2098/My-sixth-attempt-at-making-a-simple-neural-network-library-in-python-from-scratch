@@ -18,6 +18,8 @@ b = network([3,5,4,2]) # this creates a network with 3 input nodes, a hidden lay
 
 "b.nodes" in this example is a two dimensional list containing the values of the nodes of the network object b.
 
+"b.raw" in this example is a two dimensional list containing the non-activated values of the nodes of the network object b.
+
 The activation is function determined by the function "activation(x)".
 
 "b.CostValue" in this example is a number corresponding to the cost of the network. This will be explained later.
@@ -34,7 +36,7 @@ a.predict([1,1]); a.output() #makes a prediction, and returns the result.
 
 the function "cost" calculates the cost of the network, and the derivatives of the cost respectively and can be ignored. It is used when calculating the gradients.
 
-the function "gradient" calculates the derivative of the cost function in respect to each weight and bias in the most primitive way possible: by adding a small number( in this case, 10^(-8) ) and measuring the difference of the cost. This method, although it is valid, is incredibly inefficient, since it requires the time consuming "predict" function to run neumerous times( literally for every weight and bias ).
+the function "backprop" calculates the derivative of the cost function in respect to each weight and bias using back propogation.
 
 the function "train" trains the network on multiple training examples determined by the two lists "inputs", and "outputs". The first list is for the inputs, and the second list is for the corresponding desired outputs. It uses the aforementioned primitive version of gradient descent. Example:
 
