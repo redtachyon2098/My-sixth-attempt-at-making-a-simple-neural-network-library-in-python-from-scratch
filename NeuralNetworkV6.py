@@ -1,5 +1,7 @@
 import random as r
 
+import time as t
+
 alert = 1000
 
 alertatall = True
