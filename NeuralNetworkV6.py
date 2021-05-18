@@ -26,7 +26,7 @@ def leakrelu(x):
     if(x > 0):
         return x
     else:
-        return 0.05 * x
+        return x / 1024
 
 def inverse(x):
     if(x == 0):
@@ -41,6 +41,16 @@ def step(x):
 
 def activation(x):
     return leakrelu(x)
+
+def smallest(lis):
+    big = [0]
+    for x in range(len(lis) - 1):
+        y = x + 1
+        if(lis[y] < lis[big[0]]):
+            big = [y]
+        if(lis[y] == lis[big[0]] and big[0] != y):
+            big.append(y)
+    return big[r.randint(0,len(big) - 1)]
 
 def average(numbers):
     b = 0
@@ -79,8 +89,8 @@ class network:
             self.biases.append([])
             self.weights.append([])
             for y in range(nodes[x + 1]):
-                self.nodes[x + 1].append(0)
                 self.raw[x + 1].append(0)
+                self.nodes[x + 1].append(0)
                 self.biases[x].append(r.random())
                 self.weights[x].append([])
                 for z in range(nodes[x]):
@@ -126,6 +136,7 @@ class network:
         dimensions = []
         weightnumbers = []
         biasnumbers = []
+        raw = []
         nodes = []
         weights = []
         biases = []
@@ -152,8 +163,10 @@ class network:
                 a = ""
         for x in range(len(dimensions)):
             nodes.append([])
+            raw.append([])
             for y in range(dimensions[x]):
                 nodes[x].append(0)
+                raw[x].append(0)
         p = 0
         q = 0
         for x in range(len(dimensions) - 1):
@@ -167,7 +180,7 @@ class network:
                     weights[x][y].append(weightnumbers[q])
                     q += 1
         self.nodes = nodes
-        self.raw = nodes
+        self.raw = raw
         self.weights = weights
         self.biases = biases
 
@@ -202,7 +215,7 @@ class network:
         return b
 
     def backprop(self, input_list, output_list):
-        costnumber = self.cost(input_list, output_list)
+        coast = self.cost(input_list, output_list)
         self.predict(input_list)
         w = clone(self.weights)
         b = clone(self.biases)
@@ -224,108 +237,6 @@ class network:
                 expectedoutput.append(((a / len(self.nodes[x])) / (-2)) + self.nodes[x - 1][y])
         return [w,b]
 
-    def train(self,inputs,outputs,LearnRate,iterations):
-        clock = t.time()
-        lastC = 0
-        improvement = 0
-        for q in range(iterations):
-            avgw = []
-            avgb = []
-            total = 0
-            avgCost = 0
-            backW = self.weights
-            backB = self.biases
-            for x in range(len(self.weights)):
-                avgw.append([])
-                avgb.append([])
-                for y in range(len(self.weights[x])):
-                    avgw[x].append([])
-                    avgb[x].append(0)
-                    for z in range(len(self.weights[x][y])):
-                        avgw[x][y].append(0)
-            for r in range(len(inputs)):
-                c = self.backprop(inputs[r],outputs[r])
-                avgCost += self.costv / len(inputs)
-                for x in range(len(self.weights)):
-                    for y in range(len(self.weights[x])):
-                        avgb[x][y] += c[1][x][y] / len(inputs)
-                        total += c[1][x][y]
-                        for z in range(len(self.weights[x][y])):
-                            avgw[x][y][z] += c[0][x][y][z] / len(inputs)
-                            total += c[0][x][y][z]
-            if(total < 0):
-                total = -total
-            if(total == 0):
-                total = 1e-256
-            for x in range(len(self.weights)):
-                for y in range(len(self.weights[x])):
-                    self.biases[x][y] -= avgb[x][y] * LearnRate * (avgCost)**0.5 / total
-                    for z in range(len(self.weights[x][y])):
-                        self.weights[x][y][z] -= avgw[x][y][z] * LearnRate * (avgCost)**0.5 / total
-            improvement = lastC - avgCost
-            lastC = avgCost
-            self.CostValue = lastC
-            if(int(q / alert) == q / alert and alertatall == True):
-                print("Iteration:", q, "loss:",avgCost, "Time:", int((t.time() - clock) / 0.06) / 1000, "minutes, improvement:", improvement)
-        if(alertatall == True):
-            print("final loss:",avgCost)
-            
-    def toomuch(self,inputss,outputss,LearnRate,iterations, minibatchlength):
-        clock = t.time()
-        l = LearnRate
-        lastC = 0
-        for q in range(iterations):
-            dummylist = []
-            inputs = []
-            outputs = []
-            while len(inputs) < min(len(inputss), minibatchlength):
-                RNG = r.randint(0, len(inputss) - 1)
-                if not RNG in dummylist:
-                    dummylist.append(RNG)
-                    inputs.append(inputss[RNG])
-                    outputs.append(outputss[RNG])
-            avgw = []
-            avgb = []
-            total = 0
-            avgCost = 0
-            for x in range(len(self.weights)):
-                avgw.append([])
-                avgb.append([])
-                for y in range(len(self.weights[x])):
-                    avgw[x].append([])
-                    avgb[x].append(0)
-                    for z in range(len(self.weights[x][y])):
-                        avgw[x][y].append(0)
-            for j in range(len(inputs)):
-                c = self.backprop(inputs[j],outputs[j])
-                avgCost += self.costv / len(inputs)
-                for x in range(len(self.weights)):
-                    for y in range(len(self.weights[x])):
-                        avgb[x][y] += c[1][x][y] / len(inputs)
-                        total += c[1][x][y]
-                        for z in range(len(self.weights[x][y])):
-                            avgw[x][y][z] += c[0][x][y][z] / len(inputs)
-                            total += c[0][x][y][z]
-            if(total < 0):
-                total = -total
-            if(total == 0):
-                total = 1e-256
-            for x in range(len(self.weights)):
-                for y in range(len(self.weights[x])):
-                    self.biases[x][y] -= avgb[x][y] * l * (avgCost ** 0.5) / total
-                    #self.biases[x][y] -= avgb[x][y] * l / total
-                    for z in range(len(self.weights[x][y])):
-                        self.weights[x][y][z] -= avgw[x][y][z] * l * (avgCost ** 0.5) / total
-                        #self.weights[x][y][z] -= avgw[x][y][z] * l / total
-            improvement = lastC - avgCost
-            lastC = avgCost
-            self.CostValue = lastC
-            if(int(q / alert) == q / alert and alertatall == True):
-                print("Iteration:", q, "loss:",avgCost, "Time:", int((t.time() - clock) / 0.06) / 1000, "minutes, improvement:", improvement)
-        if(alertatall == True):
-            print("final loss:",avgCost)
-            print(improvement / l)
-            
     def expandlayer(self):
         a = []
         b = []
@@ -374,7 +285,108 @@ class network:
         w.append(self.weights)
         b.append(self.biases)
         return w, b
-    
+
+    def train(self,inputs,outputs,LearnRate,iterations):
+        clock = t.time()
+        l = LearnRate
+        lastC = 0
+        for q in range(iterations):
+            avgw = []
+            avgb = []
+            total = 0
+            avgCost = 0
+            for x in range(len(self.weights)):
+                avgw.append([])
+                avgb.append([])
+                for y in range(len(self.weights[x])):
+                    avgw[x].append([])
+                    avgb[x].append(0)
+                    for z in range(len(self.weights[x][y])):
+                        avgw[x][y].append(0)
+            for r in range(len(inputs)):
+                c = self.backprop(inputs[r],outputs[r])
+                avgCost += self.costv / len(inputs)
+                for x in range(len(self.weights)):
+                    for y in range(len(self.weights[x])):
+                        avgb[x][y] += c[1][x][y] / len(inputs)
+                        total += c[1][x][y]
+                        for z in range(len(self.weights[x][y])):
+                            avgw[x][y][z] += c[0][x][y][z] / len(inputs)
+                            total += c[0][x][y][z]
+            if(total < 0):
+                total = -total
+            if(total == 0):
+                total = 1e-256
+            for x in range(len(self.weights)):
+                for y in range(len(self.weights[x])):
+                    self.biases[x][y] -= avgb[x][y] * l * (avgCost ** 0.5) / total
+                    #self.biases[x][y] -= avgb[x][y] * l / total
+                    for z in range(len(self.weights[x][y])):
+                        self.weights[x][y][z] -= avgw[x][y][z] * l * (avgCost ** 0.5) / total
+                        #self.weights[x][y][z] -= avgw[x][y][z] * l / total
+            improvement = lastC - avgCost
+            lastC = avgCost
+            self.CostValue = lastC
+            if(int(q / alert) == q / alert and alertatall == True):
+                print("Iteration:", q, "loss:",avgCost, "Time:", int((t.time() - clock) / 0.06) / 1000, "minutes, improvement:", improvement)
+        if(alertatall == True):
+            print(improvement / l)
+            print("final loss:",avgCost)
+
+    def toomuch(self,inputss,outputss,LearnRate,iterations, minibatchlength):
+        clock = t.time()
+        l = LearnRate
+        lastC = 0
+        for q in range(iterations):
+            dummylist = []
+            inputs = []
+            outputs = []
+            while len(inputs) < min(len(inputss), minibatchlength):
+                RNG = r.randint(0, len(inputss) - 1)
+                if not RNG in dummylist:
+                    dummylist.append(RNG)
+                    inputs.append(inputss[RNG])
+                    outputs.append(outputss[RNG])
+            avgw = []
+            avgb = []
+            total = 0
+            avgCost = 0
+            for x in range(len(self.weights)):
+                avgw.append([])
+                avgb.append([])
+                for y in range(len(self.weights[x])):
+                    avgw[x].append([])
+                    avgb[x].append(0)
+                    for z in range(len(self.weights[x][y])):
+                        avgw[x][y].append(0)
+            for j in range(len(inputs)):
+                c = self.backprop(inputs[j],outputs[j])
+                avgCost += self.costv / len(inputs)
+                for x in range(len(self.weights)):
+                    for y in range(len(self.weights[x])):
+                        avgb[x][y] += c[1][x][y] / len(inputs)
+                        total += c[1][x][y]
+                        for z in range(len(self.weights[x][y])):
+                            avgw[x][y][z] += c[0][x][y][z] / len(inputs)
+                            total += c[0][x][y][z]
+            if(total < 0):
+                total = -total
+            if(total == 0):
+                total = 1e-256
+            for x in range(len(self.weights)):
+                for y in range(len(self.weights[x])):
+                    self.biases[x][y] -= avgb[x][y] * l * (avgCost ** 0.5) / total
+                    for z in range(len(self.weights[x][y])):
+                        self.weights[x][y][z] -= avgw[x][y][z] * l * (avgCost ** 0.5) / total
+            improvement = lastC - avgCost
+            lastC = avgCost
+            self.CostValue = lastC
+            if(int(q / alert) == q / alert and alertatall == True):
+                print("Iteration:", q, "loss:",avgCost, "Time:", int((t.time() - clock) / 0.06) / 1000, "minutes, improvement:", improvement)
+        if(alertatall == True):
+            print("final loss:",avgCost)
+            print(improvement / l)
+
     def refine(self, inputs, outputs, unitcount, randomness, iterations):
         starttime = t.time()
         rand = randomness
