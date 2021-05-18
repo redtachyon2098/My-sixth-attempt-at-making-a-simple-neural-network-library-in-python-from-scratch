@@ -268,7 +268,6 @@ class network:
             if(int(q / alert) == q / alert and alertatall == True):
                 print("Iteration:", q, "loss:",avgCost, "Time:", int((t.time() - clock) / 0.06) / 1000, "minutes, improvement:", improvement)
         if(alertatall == True):
-            print(improvement / l)
             print("final loss:",avgCost)
             
     def toomuch(self,inputss,outputss,LearnRate,iterations, minibatchlength):
