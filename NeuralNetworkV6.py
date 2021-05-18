@@ -320,10 +320,8 @@ class network:
             for x in range(len(self.weights)):
                 for y in range(len(self.weights[x])):
                     self.biases[x][y] -= avgb[x][y] * l * (avgCost ** 0.5) / total
-                    #self.biases[x][y] -= avgb[x][y] * l / total
                     for z in range(len(self.weights[x][y])):
                         self.weights[x][y][z] -= avgw[x][y][z] * l * (avgCost ** 0.5) / total
-                        #self.weights[x][y][z] -= avgw[x][y][z] * l / total
             improvement = lastC - avgCost
             lastC = avgCost
             self.CostValue = lastC
