@@ -225,6 +225,9 @@ class network:
         return [w,b]
 
     def train(self,inputs,outputs,LearnRate,iterations):
+        clock = t.time()
+        lastC = 0
+        improvement = 0
         for q in range(iterations):
             avgw = []
             avgb = []
@@ -259,11 +262,7 @@ class network:
                     self.biases[x][y] -= avgb[x][y] * LearnRate * (avgCost)**0.5 / total
                     for z in range(len(self.weights[x][y])):
                         self.weights[x][y][z] -= avgw[x][y][z] * LearnRate * (avgCost)**0.5 / total
-            if(q > 1 and avgCost > lastC):
-                self.weights = backW
-                self.biases = backB
-                print(q,lastC,avgCost)
-                break
+            improvement = lastC - avgCost
             lastC = avgCost
             self.CostValue = lastC
             if(int(q / alert) == q / alert and alertatall == True):
