@@ -4,7 +4,7 @@ import time as t
 
 alert = 1000
 
-alertatall = True
+alertatall = False
 
 expand = 1
 
@@ -300,9 +300,9 @@ class network:
                     avgb[x].append(0)
                     for z in range(len(self.weights[x][y])):
                         avgw[x][y].append(0)
-            for r in range(len(inputs)):
-                c = self.backprop(inputs[r],outputs[r])
-                avgCost += self.cost(inputs[r],outputs[r]) / len(inputs)
+            for ar in range(len(inputs)):
+                c = self.backprop(inputs[ar],outputs[ar])
+                avgCost += self.cost(inputs[ar],outputs[ar]) / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
                         avgb[x][y] += c[1][x][y] / len(inputs)
@@ -317,8 +317,10 @@ class network:
             for x in range(len(self.weights)):
                 for y in range(len(self.weights[x])):
                     self.biases[x][y] -= avgb[x][y] * l * (avgCost ** 0.5) / total
+                    #self.biases[x][y] -= avgb[x][y] * l / total
                     for z in range(len(self.weights[x][y])):
                         self.weights[x][y][z] -= avgw[x][y][z] * l * (avgCost ** 0.5) / total
+                        #self.weights[x][y][z] -= avgw[x][y][z] * l / total
             improvement = lastC - avgCost
             lastC = avgCost
             self.CostValue = lastC
@@ -354,9 +356,9 @@ class network:
                     avgb[x].append(0)
                     for z in range(len(self.weights[x][y])):
                         avgw[x][y].append(0)
-            for j in range(len(inputs)):
-                c = self.backprop(inputs[j],outputs[j])
-                avgCost += self.cost(inputs[j],outputs[j]) / len(inputs)
+            for ar in range(len(inputs)):
+                c = self.backprop(inputs[ar],outputs[ar])
+                avgCost += self.cost(inputs[ar],outputs[ar]) / len(inputs)
                 for x in range(len(self.weights)):
                     for y in range(len(self.weights[x])):
                         avgb[x][y] += c[1][x][y] / len(inputs)
@@ -371,16 +373,18 @@ class network:
             for x in range(len(self.weights)):
                 for y in range(len(self.weights[x])):
                     self.biases[x][y] -= avgb[x][y] * l * (avgCost ** 0.5) / total
+                    #self.biases[x][y] -= avgb[x][y] * l / total
                     for z in range(len(self.weights[x][y])):
                         self.weights[x][y][z] -= avgw[x][y][z] * l * (avgCost ** 0.5) / total
+                        #self.weights[x][y][z] -= avgw[x][y][z] * l / total
             improvement = lastC - avgCost
             lastC = avgCost
             self.CostValue = lastC
             if(int(q / alert) == q / alert and alertatall == True):
                 print("Iteration:", q, "loss:",avgCost, "Time:", int((t.time() - clock) / 0.06) / 1000, "minutes, improvement:", improvement)
         if(alertatall == True):
-            print("final loss:",avgCost)
             print(improvement / l)
+            print("final loss:",avgCost)
 
     def refine(self, inputs, outputs, unitcount, randomness, iterations):
         starttime = t.time()
