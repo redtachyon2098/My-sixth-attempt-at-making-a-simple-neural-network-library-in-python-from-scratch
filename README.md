@@ -1,5 +1,5 @@
 # My-sixth-attempt-at-making-a-simple-neural-network-library-in-python-from-scratch: Numpy Edition
-This branch is a compatible version made with the "numpy" library. It works on completely different principles, and it is missing a few features(i.e. The load/save feature), but it is largely compatible with the main version.
+This branch is a compatible version made with the "numpy" library. The code looks completely different, and it is missing a few features(i.e. The load/save feature), but it is largely compatible with the main version.
 __________________________________________________functions__________________________________________________
 
 The class "network" makes a feed forward neural network object of any size(determined by a list of the number of nodes in each layer.)
