@@ -1,6 +1,5 @@
-# My-sixth-attempt-at-making-a-simple-neural-network-library-in-python-from-scratch
-This is my attempt at making a neural network from scratch. I have been working on this since 2016. The goal of this project was to create a library capable of making and training a neural network of any arbitrary size while only using the library "random". However, this fork is a compatible version made with the "numpy" library. It works on completely different principles, but it is largely compatible with the main version.
-
+# My-sixth-attempt-at-making-a-simple-neural-network-library-in-python-from-scratch: Numpy Edition
+This branch is a compatible version made with the "numpy" library. It works on completely different principles, and it is missing a few features(i.e. The load/save feature), but it is largely compatible with the main version.
 __________________________________________________functions__________________________________________________
 
 The class "network" makes a feed forward neural network object of any size(determined by a list of the number of nodes in each layer.)
