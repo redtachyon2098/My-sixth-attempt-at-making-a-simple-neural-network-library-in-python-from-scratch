@@ -90,13 +90,22 @@ class network:
                 clock = t.time()
                 
     def toomuch(self, inputss, outputss, LearnRate, iterations, minibatchlength):
-        dummylist = []
-        inputs = []
-        outputs = []
-        while len(dummylist) < min(len(inputss), minibatchlength):
-            RNG = r.randint(0, len(inputss) - 1)
-            if not RNG in dummylist:
-                dummylist.append(RNG)
-                inputs.append(inputss[RNG])
-                outputs.append(outputss[RNG])
-        self.train(inputs, outputs, LearnRate, iterations)
+        clock = t.time()
+        for i in range(iterations):
+            dummylist = []
+            inputs = []
+            outputs = []
+            while len(dummylist) < min(len(inputss), minibatchlength):
+                RNG = r.randint(0, len(inputss) - 1)
+                if not RNG in dummylist:
+                    dummylist.append(RNG)
+                    inputs.append(inputss[RNG])
+                    outputs.append(outputss[RNG])
+            c = 0
+            for x, y in enumerate(inputs):
+                self.iterate(y, outputs[x], LearnRate)
+                c += self.cost
+            self.CostValue = c / len(inputs)
+            if t.time() - clock >= 2:
+                print(self.CostValue)
+                clock = t.time()
