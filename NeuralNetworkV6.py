@@ -68,7 +68,7 @@ class network:
 
     def iterate(self, inputvector, outputvector, LearnRate):
         cost = self.predict(inputvector)
-        cost -= outputvector
+        cost -= n.array(outputvector)
         cost = cost ** 2
         cost = cost.sum()
         self.cost = cost
