@@ -4,6 +4,8 @@ import random as r
 
 import time as t
 
+alertrate = 2
+
 def activate(vector, func, derivative=False):
     if func == "relu":
         dupe = n.zeros_like(vector)
@@ -36,21 +38,19 @@ class layer:
         self.rawout = n.dot(self.invector, self.weights) + self.biases
         self.outvector = activate(self.rawout, self.activation)
 
-    def derive(self, vector, output, fac):
-        result = n.array(output)
-        dout = 2 * (self.outvector - result)
+    def derive(self, vector, dout, fac):
         self.dweights = n.outer(self.invector, dout * activate(self.rawout, self.activation, derivative=True) * self.rawout)
         self.dbiases = dout
         self.dnodes = n.dot(dout * activate(self.rawout, self.activation, derivative=True) * self.rawout, self.weights.T)
         total = abs(n.sum(self.dweights) + n.sum(self.dbiases)) + 0.01
         self.weights -= self.dweights * fac / total
         self.biases -= self.dbiases * fac / total
-        nextone = self.invector - self.dnodes / 2
-        return nextone
+        return self.dnodes
 
 class network:
     def __init__(self, dimensions):
         self.structure = []
+        self.dinput = []
         self.cost = 0
         self.CostValue = 0
         for x in range(len(dimensions) - 1):
@@ -64,18 +64,18 @@ class network:
         return final
 
     def output(self):
-        return list(self.structure[-1].outvector)
+        return (self.structure[-1].outvector).tolist()
 
     def iterate(self, inputvector, outputvector, LearnRate):
-        cost = self.predict(inputvector)
-        cost -= n.array(outputvector)
-        cost = cost ** 2
+        dcost = self.predict(inputvector)
+        dcost -= outputvector
+        cost = dcost ** 2
         cost = cost.sum()
         self.cost = cost
-        supposed = outputvector
         for q in range(len(self.structure)):
             x = len(self.structure) - q - 1
-            supposed = self.structure[x].derive(self.structure[x].invector, supposed, LearnRate * cost)
+            dcost = self.structure[x].derive(self.structure[x].invector, dcost, LearnRate * cost)
+        self.dinput = dcost
 
     def train(self, inputs, outputs, LearnRate, iterations):
         clock = t.time()
@@ -85,10 +85,10 @@ class network:
                 self.iterate(y, outputs[x], LearnRate)
                 c += self.cost
             self.CostValue = c / len(inputs)
-            if t.time() - clock >= 2:
-                print(self.CostValue)
-                clock = t.time()
-                
+            if alertrate > 0:
+                if t.time() - clock >= alertrate:
+                    print(self.CostValue)
+                    clock = t.time()
     def toomuch(self, inputss, outputss, LearnRate, iterations, minibatchlength):
         clock = t.time()
         for i in range(iterations):
@@ -106,6 +106,7 @@ class network:
                 self.iterate(y, outputs[x], LearnRate)
                 c += self.cost
             self.CostValue = c / len(inputs)
-            if t.time() - clock >= 2:
-                print(self.CostValue)
-                clock = t.time()
+            if alertrate > 0:
+                if t.time() - clock >= alertrate:
+                    print(self.CostValue)
+                    clock = t.time()
