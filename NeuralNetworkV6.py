@@ -89,6 +89,7 @@ class network:
                 if t.time() - clock >= alertrate:
                     print(self.CostValue)
                     clock = t.time()
+                    
     def toomuch(self, inputss, outputss, LearnRate, iterations, minibatchlength):
         clock = t.time()
         for i in range(iterations):
